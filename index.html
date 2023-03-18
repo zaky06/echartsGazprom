@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>ECharts</title>
+        <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.1/dist/echarts.min.js"></script>
+    </head>
+    <body>
+        <div id="main" style="width: 778px;height: 560px;"></div>
+        <script type="text/javascript">
+            const V_PROGRAMME_IT = "В программе ИТ";
+            const V_PROGRAMME_CP = "В программе ЦП";
+
+            const VNE_PROGRAMME_IT = "Вне программ ИТ";
+            const VNE_PROGRAMME_CP = "Вне программ ЦП";
+
+            const data = [
+                { period: "Март", name: "В программе ЦП", value: 120 },
+                { period: "Апрель", name: "В программе ЦП", value: 120 },
+                { period: "Май", name: "В программе ЦП", value: 120 },
+                { period: "Июнь", name: "В программе ЦП", value: 120 },
+                { period: "Июль", name: "В программе ЦП", value: 120 },
+                { period: "Август", name: "В программе ЦП", value: 120 },
+                { period: "Сентябрь", name: "В программе ЦП", value: 120 },
+                { period: "Март", name: "В программе ИТ", value: 220 },
+                { period: "Апрель", name: "В программе ИТ", value: 182 },
+                { period: "Май", name: "В программе ИТ", value: 191 },
+                { period: "Июнь", name: "В программе ИТ", value: 234 },
+                { period: "Июль", name: "В программе ИТ", value: 290 },
+                { period: "Август", name: "В программе ИТ", value: 330 },
+                { period: "Сентябрь", name: "В программе ИТ", value: 310 },
+                { period: "Март", name: "Вне программ ЦП", value: 620 },
+                { period: "Апрель", name: "Вне программ ЦП", value: 732 },
+                { period: "Май", name: "Вне программ ЦП", value: 701 },
+                { period: "Июнь", name: "Вне программ ЦП", value: 734 },
+                { period: "Июль", name: "Вне программ ЦП", value: 1090 },
+                { period: "Август", name: "Вне программ ЦП", value: 1130 },
+                { period: "Сентябрь", name: "Вне программ ЦП", value: 1120 },
+                { period: "Март", name: "Вне программ ИТ", value: 120 },
+                { period: "Апрель", name: "Вне программ ИТ", value: 132 },
+                { period: "Май", name: "Вне программ ИТ", value: 101 },
+                { period: "Июнь", name: "Вне программ ИТ", value: 134 },
+                { period: "Июль", name: "Вне программ ИТ", value: 290 },
+                { period: "Август", name: "Вне программ ИТ", value: 230 },
+                { period: "Сентябрь", name: "Вне программ ИТ", value: 220 }
+            ];  
+            const myChart = echarts.init(document.getElementById('main'));
+
+            const gMonth = data.reduce((acc, elem) => acc.map[elem.period] ? acc : ((acc.map[elem.period] = true), acc.gMonth.push(elem), acc), {
+                map: {},
+                gMonth: []
+            }).gMonth;
+
+            const vIt = [];
+            const vCp = [];
+            const vneIt = [];
+            const vneCp = [];
+
+            data.forEach(elem => {
+                if (elem.name === V_PROGRAMME_IT) {
+                    vIt.push(elem);
+                }
+                if (elem.name === V_PROGRAMME_CP) {
+                    vCp.push(elem);
+                }
+                if (elem.name === VNE_PROGRAMME_IT) {
+                    vneIt.push(elem);
+                }
+                if (elem.name === VNE_PROGRAMME_CP) {
+                    vneCp.push(elem);
+                }
+            })
+
+            const getValuesLayout = (array) => array.reduce((prevValue, currentValue) => {
+                return prevValue + `<div>${currentValue.marker} Проекты ИТ <strong>${currentValue.data} шт.</strong></div>`
+            }, '')
+
+            const option = {    
+                title: {
+                    text: 'Проекты в программах и вне программ',
+                    textStyle: {
+                        color: '#002033'
+                    },
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    textStyle: {
+                        color: '#002033'
+                    },
+
+                    formatter: (params) => {
+                        const vProgramme = params.filter((elem) => elem.seriesName === V_PROGRAMME_IT || elem.seriesName === V_PROGRAMME_CP);
+                        const vneProgramm = params.filter((elem) => elem.seriesName === VNE_PROGRAMME_IT || elem.seriesName === VNE_PROGRAMME_CP);
+
+                        const vProgrammeIt = [];
+                        const vProgrammeCp = [];
+                        const vneProgrammeIt = [];
+                        const vneProgrammeCp = [];
+
+                        params.forEach(elem => {
+                            if (elem.seriesName === V_PROGRAMME_IT) {
+                                vProgrammeIt.push(elem);
+                            } 
+                            if (elem.seriesName === V_PROGRAMME_CP) {
+                                vProgrammeCp.push(elem);
+                            }
+                            if (elem.seriesName === VNE_PROGRAMME_IT) {
+                                vneProgrammeIt.push(elem);
+                            } 
+                            if (elem.seriesName === VNE_PROGRAMME_CP) {
+                                vneProgrammeCp.push(elem);
+                            }
+                        })
+
+                        const strVProgrammeIt = vProgrammeIt.length !== 0 ? getValuesLayout(vProgrammeIt) : '';
+                        const strVProgrammeCp = vProgrammeCp.length !== 0 ? getValuesLayout(vProgrammeCp) : '';
+
+                        const strVneProgrammeIt = vneProgrammeIt.length !== 0 ? getValuesLayout(vneProgrammeIt) : '';
+                        const strVneProgrammeCp = vneProgrammeCp.length !== 0 ? getValuesLayout(vneProgrammeCp) : '';
+                        
+                        const sumV = vProgramme.length !== 0 ? vProgramme.reduce((acc, num) => acc + num.data, 0) : 0;
+                        const sumVne = vneProgramm.length !== 0 ? vneProgramm.reduce((acc, num) => acc + num.data, 0) : 0;
+                        
+                        const sum = sumV + sumVne;
+                        const procentV = sumV !== 0 ? Math.round(100 / sum * sumV) : 0;
+                        const procentVne = sumVne !== 0 ? Math.round(100 / sum * sumVne) : 0;
+
+                        return (
+                            `<div>
+                                <div>
+                                    <strong>${params[0].axisValue} 2023</strong>
+                                </div>
+                                <div>
+                                    <strong>В программе ${procentV} % | ${sumV} шт.</strong>
+                                </div>
+                                ${strVProgrammeIt}
+                                ${strVProgrammeCp}
+                                <div>
+                                    <strong>Вне программ ${procentVne} % | ${sumVne} шт.</strong>
+                                </div>
+                                ${strVneProgrammeIt}
+                                ${strVneProgrammeCp}
+                            </div>`
+                        )
+                    }
+                },
+                xAxis: {
+                    data: gMonth.map((elem) => {
+                    return elem.period
+                    })
+                },
+                yAxis: {
+
+                },
+                series: [
+                    {
+                        type: 'bar',
+                        data: vIt.map((elem) => {
+                            return elem.value
+                        }),
+                        stack: 'x',
+                        name: V_PROGRAMME_IT,
+                        itemStyle: {
+                            color: "#0078D2"
+                        },
+                        label: {
+                            show: true,
+                            position: 'top'
+                        },
+                    },
+                    {
+                        type: 'bar',
+                        data: vCp.map((elem) => {
+                            return elem.value
+                        }),
+                        stack: 'x',
+                        name: V_PROGRAMME_CP,
+                        itemStyle: {
+                            color: "#56B9F2"
+                        },
+                        label: {
+                            show: true,
+                            position: 'top'
+                        },
+                    },
+
+                    {
+                        type: 'bar',
+                        data: vneIt.map((elem) => {
+                            return elem.value
+                        }),
+                        stack: 'y',
+                        name: VNE_PROGRAMME_IT,
+                        itemStyle: {
+                            color: "#00724C"
+                        },
+                        label: {
+                            show: true,
+                            position: 'top'
+                        },
+                    },
+                    {
+                        type: 'bar',
+                        data: vneCp.map((elem) => {
+                            return elem.value
+                        }),
+                        stack: 'y',
+                        name: VNE_PROGRAMME_CP,
+                        itemStyle: {
+                            color: "#22C38E"
+                        },
+                        label: {
+                            show: true,
+                            position: 'top'
+                        },
+                    }
+                    
+                ],
+                legend: {
+                    orient: 'horizontal',
+                    bottom: 'bottom',
+                    show: true,
+                    icon: 'circle',
+                    data: [V_PROGRAMME_IT, V_PROGRAMME_CP, VNE_PROGRAMME_IT, VNE_PROGRAMME_CP],
+                    textStyle: {
+                        color: 'rgba(0, 32, 51, 0.6)'
+                    },
+                },
+            };
+            myChart.setOption(option);
+        </script>
+    </body>
+</html>
